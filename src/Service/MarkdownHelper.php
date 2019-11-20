@@ -20,12 +20,12 @@ class MarkdownHelper
 
     private $logger;
 
-    public function __construct(AdapterInterface $cache, MarkdownInterface $markdown,LoggerInterface $logger )
+    public function __construct(AdapterInterface $cache, MarkdownInterface $markdown,LoggerInterface  $markdownLogger )
 
 {
     $this->cache = $cache;
     $this->markdown = $markdown;
-    $this->logger = $logger;
+    $this->logger =  $markdownLogger;
 }
     public function parse(string $source): string
     {   if (stripos($source, 'bacon') !== false) {
