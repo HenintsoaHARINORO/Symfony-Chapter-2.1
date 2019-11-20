@@ -15,6 +15,7 @@ use Twig\Environment;
 class ArticleController extends AbstractController
 {
     /**
+<<<<<<< HEAD
      * Currently unused:just showing a controller with a constructor!
      */
     private $isDebug;
@@ -26,6 +27,8 @@ class ArticleController extends AbstractController
      }
 
     /**
+=======
+>>>>>>> 1e13a1f9c1f189f7f35a3e03ec7acab12cc3b9aa
      * @Route("/", name="app_homepage")
      */
     public function homepage()
