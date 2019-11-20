@@ -1,0 +1,4 @@
+knp_markdown:
+    parser:
+
+        service: markdown.parser.light

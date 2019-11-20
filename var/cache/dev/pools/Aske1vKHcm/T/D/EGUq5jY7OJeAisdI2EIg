@@ -1,0 +1,29 @@
+<?php
+
+namespace Symfony\Component\VarExporter\Internal;
+
+return $getExpiry ? PHP_INT_MAX : Hydrator::hydrate(
+    $o = [
+        clone (Registry::$prototypes['Sensio\\Bundle\\FrameworkExtraBundle\\Configuration\\Route'] ?? Registry::p('Sensio\\Bundle\\FrameworkExtraBundle\\Configuration\\Route')),
+    ],
+    null,
+    [
+        'Symfony\\Component\\Routing\\Annotation\\Route' => [
+            'path' => [
+                '/news/{slug}/heart',
+            ],
+            'name' => [
+                'article_toggle_heart',
+            ],
+            'methods' => [
+                [
+                    'POST',
+                ],
+            ],
+        ],
+    ],
+    [
+        $o[0],
+    ],
+    []
+);
