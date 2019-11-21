@@ -47,3 +47,5 @@ f63e77,127.0.0.1,GET,http://127.0.0.1:8000/news/why-asteroids-taste-like-bacon,1
 9d7619,127.0.0.1,GET,http://127.0.0.1:8000/_wdt/f63e77,1574257134,,500
 96a4ea,127.0.0.1,GET,http://127.0.0.1:8000/news/why-asteroids-taste-like-bacon,1574257718,,200
 4bf68a,127.0.0.1,GET,http://127.0.0.1:8000/news/why-asteroids-taste-like-bacon,1574257896,,200
+597821,127.0.0.1,GET,http://localhost:8000/,1574314888,,200
+97c13e,127.0.0.1,GET,http://localhost:8000/news/why-asteroids-taste-like-bacon,1574314891,,200

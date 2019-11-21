@@ -17,6 +17,8 @@
       <parameter key="MonologBundle">Symfony\Bundle\MonologBundle\MonologBundle</parameter>
       <parameter key="DebugBundle">Symfony\Bundle\DebugBundle\DebugBundle</parameter>
       <parameter key="KnpMarkdownBundle">Knp\Bundle\MarkdownBundle\KnpMarkdownBundle</parameter>
+      <parameter key="HttplugBundle">Http\HttplugBundle\HttplugBundle</parameter>
+      <parameter key="NexySlackBundle">Nexy\SlackBundle\NexySlackBundle</parameter>
     </parameter>
     <parameter key="kernel.bundles_metadata" type="collection">
       <parameter key="FrameworkBundle" type="collection">
@@ -50,6 +52,14 @@
       <parameter key="KnpMarkdownBundle" type="collection">
         <parameter key="path">/home/henintsoa/Php_projects/Symfony/the_space2/start/vendor/knplabs/knp-markdown-bundle</parameter>
         <parameter key="namespace">Knp\Bundle\MarkdownBundle</parameter>
+      </parameter>
+      <parameter key="HttplugBundle" type="collection">
+        <parameter key="path">/home/henintsoa/Php_projects/Symfony/the_space2/start/vendor/php-http/httplug-bundle/src</parameter>
+        <parameter key="namespace">Http\HttplugBundle</parameter>
+      </parameter>
+      <parameter key="NexySlackBundle" type="collection">
+        <parameter key="path">/home/henintsoa/Php_projects/Symfony/the_space2/start/vendor/nexylan/slack-bundle/src</parameter>
+        <parameter key="namespace">Nexy\SlackBundle</parameter>
       </parameter>
     </parameter>
     <parameter key="kernel.charset">UTF-8</parameter>
@@ -119,6 +129,11 @@
       </parameter>
     </parameter>
     <parameter key="env(VAR_DUMPER_SERVER)">127.0.0.1:9912</parameter>
+    <parameter key="nexy_slack.endpoint">https://hooks.slack.com/services/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  ~</parameter>
+    <parameter key="nexy_slack.config" type="collection">
+      <parameter key="sticky_channel">false</parameter>
+      <parameter key="markdown_in_attachments" type="collection"/>
+    </parameter>
     <parameter key="data_collector.templates" type="collection">
       <parameter key="data_collector.request" type="collection">
         <parameter>request</parameter>
@@ -163,6 +178,10 @@
       <parameter key="data_collector.dump" type="collection">
         <parameter>dump</parameter>
         <parameter>@Debug/Profiler/dump.html.twig</parameter>
+      </parameter>
+      <parameter key="httplug.collector.collector" type="collection">
+        <parameter>httplug</parameter>
+        <parameter>@Httplug/webprofiler.html.twig</parameter>
       </parameter>
       <parameter key="data_collector.config" type="collection">
         <parameter>config</parameter>
@@ -736,6 +755,9 @@
         <argument type="service" id="data_collector.dump"/>
       </call>
       <call method="add">
+        <argument type="service" id="httplug.collector.collector"/>
+      </call>
+      <call method="add">
         <argument type="service" id="data_collector.config"/>
       </call>
     </service>
@@ -1039,6 +1061,14 @@
         <argument>2048</argument>
       </call>
       <call method="addListener">
+        <argument>console.command</argument>
+        <argument type="collection">
+          <argument type="service" id="debug.debug_handlers_listener"/>
+          <argument>configure</argument>
+        </argument>
+        <argument>2048</argument>
+      </call>
+      <call method="addListener">
         <argument>kernel.exception</argument>
         <argument type="collection">
           <argument type="service" id="debug.debug_handlers_listener"/>
@@ -1171,6 +1201,38 @@
         <argument type="collection">
           <argument type="service" id="debug.dump_listener"/>
           <argument>configure</argument>
+        </argument>
+        <argument>1024</argument>
+      </call>
+      <call method="addListener">
+        <argument>kernel.request</argument>
+        <argument type="collection">
+          <argument type="service" id="httplug.strategy"/>
+          <argument>onEvent</argument>
+        </argument>
+        <argument>1024</argument>
+      </call>
+      <call method="addListener">
+        <argument>console.command</argument>
+        <argument type="collection">
+          <argument type="service" id="httplug.strategy"/>
+          <argument>onEvent</argument>
+        </argument>
+        <argument>1024</argument>
+      </call>
+      <call method="addListener">
+        <argument>kernel.request</argument>
+        <argument type="collection">
+          <argument type="service" id="Http\HttplugBundle\Collector\PluginClientFactoryListener"/>
+          <argument>onEvent</argument>
+        </argument>
+        <argument>1024</argument>
+      </call>
+      <call method="addListener">
+        <argument>console.command</argument>
+        <argument type="collection">
+          <argument type="service" id="Http\HttplugBundle\Collector\PluginClientFactoryListener"/>
+          <argument>onEvent</argument>
         </argument>
         <argument>1024</argument>
       </call>
@@ -1518,6 +1580,9 @@
       <call method="addExtension">
         <argument type="service" id="twig.extension.exercise.twig"/>
       </call>
+      <call method="addExtension">
+        <argument type="service" id="httplug.collector.twig.http_message"/>
+      </call>
       <call method="addGlobal">
         <argument>app</argument>
         <argument type="service" id="twig.app_variable"/>
@@ -1599,6 +1664,14 @@
       <call method="addPath">
         <argument>/home/henintsoa/Php_projects/Symfony/the_space2/start/vendor/symfony/debug-bundle/Resources/views</argument>
         <argument>!Debug</argument>
+      </call>
+      <call method="addPath">
+        <argument>/home/henintsoa/Php_projects/Symfony/the_space2/start/vendor/php-http/httplug-bundle/src/Resources/views</argument>
+        <argument>Httplug</argument>
+      </call>
+      <call method="addPath">
+        <argument>/home/henintsoa/Php_projects/Symfony/the_space2/start/vendor/php-http/httplug-bundle/src/Resources/views</argument>
+        <argument>!Httplug</argument>
       </call>
       <call method="addPath">
         <argument>/home/henintsoa/Php_projects/Symfony/the_space2/start/templates</argument>
@@ -1959,6 +2032,178 @@
       <tag name="twig.extension"/>
       <argument type="service" id="markdown.parser.parser_manager"/>
     </service>
+    <service id="httplug.strategy" class="Http\HttplugBundle\Discovery\ConfiguredClientsStrategy">
+      <tag name="kernel.event_subscriber"/>
+      <tag name="container.hot_path"/>
+      <argument type="service" id="httplug.collector.auto_discovered_client" on-invalid="null"/>
+      <argument>null</argument>
+    </service>
+    <service id="httplug.message_factory.default" class="Http\Message\MessageFactory">
+      <factory class="Http\Discovery\MessageFactoryDiscovery" method="find"/>
+    </service>
+    <service id="httplug.stream_factory.default" class="Http\Message\StreamFactory">
+      <factory class="Http\Discovery\StreamFactoryDiscovery" method="find"/>
+    </service>
+    <service id="httplug.uri_factory.default" class="Http\Message\UriFactory">
+      <factory class="Http\Discovery\UriFactoryDiscovery" method="find"/>
+    </service>
+    <service id="httplug.async_client.default" class="Http\Client\HttpAsyncClient">
+      <factory class="Http\Discovery\HttpAsyncClientDiscovery" method="find"/>
+    </service>
+    <service id="Http\Client\Common\PluginClientFactory" class="Http\HttplugBundle\Collector\PluginClientFactory" public="false">
+      <argument type="service" id="httplug.collector.collector"/>
+      <argument type="service" id="httplug.collector.formatter"/>
+      <argument type="service" id="debug.stopwatch"/>
+    </service>
+    <service id="httplug.plugin.cache" class="Http\Client\Common\Plugin\CachePlugin" public="false">
+      <argument></argument>
+      <argument></argument>
+      <argument></argument>
+    </service>
+    <service id="httplug.plugin.content_length" class="Http\Client\Common\Plugin\ContentLengthPlugin" public="false"/>
+    <service id="httplug.plugin.cookie" class="Http\Client\Common\Plugin\CookiePlugin" public="false">
+      <argument></argument>
+    </service>
+    <service id="httplug.plugin.decoder" class="Http\Client\Common\Plugin\DecoderPlugin" public="false">
+      <argument type="collection">
+        <argument key="use_content_encoding">true</argument>
+      </argument>
+    </service>
+    <service id="httplug.plugin.error" class="Http\Client\Common\Plugin\ErrorPlugin" public="false"/>
+    <service id="httplug.plugin.history" class="Http\Client\Common\Plugin\HistoryPlugin" public="false">
+      <argument></argument>
+    </service>
+    <service id="httplug.plugin.logger" class="Http\Client\Common\Plugin\LoggerPlugin" public="false">
+      <argument type="service" id="monolog.logger"/>
+      <argument>null</argument>
+    </service>
+    <service id="httplug.plugin.redirect" class="Http\Client\Common\Plugin\RedirectPlugin" public="false">
+      <argument type="collection">
+        <argument key="preserve_header">true</argument>
+        <argument key="use_default_for_multiple">true</argument>
+      </argument>
+    </service>
+    <service id="httplug.plugin.retry" class="Http\Client\Common\Plugin\RetryPlugin" public="false">
+      <argument type="collection">
+        <argument key="retries">1</argument>
+      </argument>
+    </service>
+    <service id="httplug.plugin.stopwatch" class="Http\Client\Common\Plugin\StopwatchPlugin" public="false">
+      <argument type="service" id="debug.stopwatch"/>
+    </service>
+    <service id="httplug.plugin.add_host" class="Http\Client\Common\Plugin\AddHostPlugin" public="false" abstract="true">
+      <argument></argument>
+      <argument></argument>
+    </service>
+    <service id="httplug.plugin.add_path" class="Http\Client\Common\Plugin\AddPathPlugin" public="false" abstract="true">
+      <argument></argument>
+    </service>
+    <service id="httplug.plugin.base_uri" class="Http\Client\Common\Plugin\BaseUriPlugin" public="false" abstract="true">
+      <argument></argument>
+      <argument></argument>
+    </service>
+    <service id="httplug.plugin.content_type" class="Http\Client\Common\Plugin\ContentTypePlugin" public="false" abstract="true">
+      <argument></argument>
+    </service>
+    <service id="httplug.plugin.header_append" class="Http\Client\Common\Plugin\HeaderAppendPlugin" public="false" abstract="true">
+      <argument></argument>
+    </service>
+    <service id="httplug.plugin.header_defaults" class="Http\Client\Common\Plugin\HeaderDefaultsPlugin" public="false" abstract="true">
+      <argument></argument>
+    </service>
+    <service id="httplug.plugin.header_set" class="Http\Client\Common\Plugin\HeaderSetPlugin" public="false" abstract="true">
+      <argument></argument>
+    </service>
+    <service id="httplug.plugin.header_remove" class="Http\Client\Common\Plugin\HeaderRemovePlugin" public="false" abstract="true">
+      <argument></argument>
+    </service>
+    <service id="httplug.plugin.query_defaults" class="Http\Client\Common\Plugin\QueryDefaultsPlugin" public="false" abstract="true">
+      <argument></argument>
+    </service>
+    <service id=".1_CurlCommandFormatter~QC8sM11" class="Http\Message\Formatter\CurlCommandFormatter" public="false"/>
+    <service id="httplug.formatter.full_http_message" class="Http\Message\Formatter\FullHttpMessageFormatter" public="false">
+      <argument>0</argument>
+    </service>
+    <service id="httplug.collector.formatter" class="Http\HttplugBundle\Collector\Formatter" public="false">
+      <argument type="service" id="httplug.formatter.full_http_message"/>
+      <argument type="service" id=".1_CurlCommandFormatter~QC8sM11"/>
+    </service>
+    <service id="httplug.collector.collector" class="Http\HttplugBundle\Collector\Collector" public="false">
+      <tag name="data_collector" template="@Httplug/webprofiler.html.twig" priority="200" id="httplug"/>
+    </service>
+    <service id="httplug.plugin.stack" class="Http\HttplugBundle\Collector\StackPlugin" public="false" abstract="true">
+      <argument type="service" id="httplug.collector.collector"/>
+      <argument type="service" id="httplug.collector.formatter"/>
+    </service>
+    <service id="httplug.collector.twig.http_message" class="Http\HttplugBundle\Collector\Twig\HttpMessageMarkupExtension" public="false">
+      <tag name="twig.extension"/>
+    </service>
+    <service id="httplug.collector.auto_discovered_client" class="Http\HttplugBundle\Collector\ProfileClient" public="false">
+      <argument type="service" id="httplug.collector.auto_discovered_client.inner"/>
+      <argument type="service" id="httplug.collector.collector"/>
+      <argument type="service" id="httplug.collector.formatter"/>
+      <argument type="service" id="debug.stopwatch"/>
+    </service>
+    <service id="httplug.collector.factory.auto" class="Http\HttplugBundle\Collector\ProfileClientFactory" public="false">
+      <argument type="service" id="httplug.collector.factory.auto.inner"/>
+      <argument type="service" id="httplug.collector.collector"/>
+      <argument type="service" id="httplug.collector.formatter"/>
+      <argument type="service" id="debug.stopwatch"/>
+    </service>
+    <service id="httplug.collector.factory.buzz" class="Http\HttplugBundle\Collector\ProfileClientFactory" public="false">
+      <argument type="service" id="httplug.collector.factory.buzz.inner"/>
+      <argument type="service" id="httplug.collector.collector"/>
+      <argument type="service" id="httplug.collector.formatter"/>
+      <argument type="service" id="debug.stopwatch"/>
+    </service>
+    <service id="httplug.collector.factory.curl" class="Http\HttplugBundle\Collector\ProfileClientFactory" public="false">
+      <argument type="service" id="httplug.collector.factory.curl.inner"/>
+      <argument type="service" id="httplug.collector.collector"/>
+      <argument type="service" id="httplug.collector.formatter"/>
+      <argument type="service" id="debug.stopwatch"/>
+    </service>
+    <service id="httplug.collector.factory.guzzle5" class="Http\HttplugBundle\Collector\ProfileClientFactory" public="false">
+      <argument type="service" id="httplug.collector.factory.guzzle5.inner"/>
+      <argument type="service" id="httplug.collector.collector"/>
+      <argument type="service" id="httplug.collector.formatter"/>
+      <argument type="service" id="debug.stopwatch"/>
+    </service>
+    <service id="httplug.collector.factory.guzzle6" class="Http\HttplugBundle\Collector\ProfileClientFactory" public="false">
+      <argument type="service" id="httplug.collector.factory.guzzle6.inner"/>
+      <argument type="service" id="httplug.collector.collector"/>
+      <argument type="service" id="httplug.collector.formatter"/>
+      <argument type="service" id="debug.stopwatch"/>
+    </service>
+    <service id="httplug.collector.factory.react" class="Http\HttplugBundle\Collector\ProfileClientFactory" public="false">
+      <argument type="service" id="httplug.collector.factory.react.inner"/>
+      <argument type="service" id="httplug.collector.collector"/>
+      <argument type="service" id="httplug.collector.formatter"/>
+      <argument type="service" id="debug.stopwatch"/>
+    </service>
+    <service id="httplug.collector.factory.socket" class="Http\HttplugBundle\Collector\ProfileClientFactory" public="false">
+      <argument type="service" id="httplug.collector.factory.socket.inner"/>
+      <argument type="service" id="httplug.collector.collector"/>
+      <argument type="service" id="httplug.collector.formatter"/>
+      <argument type="service" id="debug.stopwatch"/>
+    </service>
+    <service id="Http\HttplugBundle\Collector\PluginClientFactoryListener" class="Http\HttplugBundle\Collector\PluginClientFactoryListener">
+      <tag name="kernel.event_subscriber"/>
+      <tag name="container.hot_path"/>
+      <argument type="service" id="Http\Client\Common\PluginClientFactory"/>
+    </service>
+    <service id="httplug.client.app.client" class="Http\Client\HttpClient" public="false">
+      <argument type="collection"/>
+      <factory service="httplug.collector.factory.auto" method="createClient"/>
+    </service>
+    <service id="httplug.client.app.http_methods" class="Http\Client\Common\HttpMethodsClient" public="false">
+      <argument type="service" id="httplug.client.app.http_methods.inner"/>
+      <argument type="service" id="httplug.message_factory.default"/>
+    </service>
+    <service id="Nexy\Slack\Client" class="Nexy\Slack\Client" public="true">
+      <argument>https://hooks.slack.com/services/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  ~</argument>
+      <argument>%nexy_slack.config%</argument>
+      <argument type="service" id="httplug.client.app.http_methods"/>
+    </service>
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\ArticleController" class="App\Controller\ArticleController" public="false" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\ArticleController" class="App\Controller\ArticleController" public="false" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\ArticleController" class="App\Controller\ArticleController" public="false" autowire="true" autoconfigure="true" abstract="true"/>
@@ -2218,6 +2463,38 @@
         <argument type="service" id="debug.argument_resolver.not_tagged_controller"/>
       </argument>
     </service>
+    <service id="httplug.collector.auto_discovered_client.inner" class="Http\Client\HttpClient" public="false">
+      <factory class="Http\Discovery\HttpClientDiscovery" method="find"/>
+    </service>
+    <service id="httplug.collector.factory.auto.inner" class="Http\HttplugBundle\ClientFactory\AutoDiscoveryFactory" public="false"/>
+    <service id="httplug.collector.factory.buzz.inner" class="Http\HttplugBundle\ClientFactory\BuzzFactory" public="false">
+      <argument type="service" id="httplug.message_factory.default"/>
+    </service>
+    <service id="httplug.collector.factory.curl.inner" class="Http\HttplugBundle\ClientFactory\CurlFactory" public="false">
+      <argument type="service" id="httplug.message_factory.default"/>
+      <argument type="service" id="httplug.stream_factory.default"/>
+    </service>
+    <service id="httplug.collector.factory.guzzle5.inner" class="Http\HttplugBundle\ClientFactory\Guzzle5Factory" public="false">
+      <argument type="service" id="httplug.message_factory.default"/>
+    </service>
+    <service id="httplug.collector.factory.guzzle6.inner" class="Http\HttplugBundle\ClientFactory\Guzzle6Factory" public="false"/>
+    <service id="httplug.collector.factory.react.inner" class="Http\HttplugBundle\ClientFactory\ReactFactory" public="false">
+      <argument type="service" id="httplug.message_factory.default"/>
+    </service>
+    <service id="httplug.collector.factory.socket.inner" class="Http\HttplugBundle\ClientFactory\SocketFactory" public="false">
+      <argument type="service" id="httplug.message_factory.default"/>
+    </service>
+    <service id="httplug.client.app.http_methods.inner" class="Http\Client\Common\PluginClient" public="false">
+      <argument type="service" id="httplug.client.app.client"/>
+      <argument type="collection">
+        <argument type="service" id="httplug.plugin.content_length"/>
+        <argument type="service" id="httplug.plugin.redirect"/>
+      </argument>
+      <argument type="collection">
+        <argument key="client_name">app</argument>
+      </argument>
+      <factory service="Http\Client\Common\PluginClientFactory" method="createClient"/>
+    </service>
     <service id="debug.argument_resolver.request_attribute.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestAttributeValueResolver" public="false"/>
     <service id="debug.argument_resolver.request.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestValueResolver" public="false"/>
     <service id="debug.argument_resolver.session.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\SessionValueResolver" public="false"/>
@@ -2412,6 +2689,21 @@
     <service id="markdown.parser" alias="markdown.parser.light" public="true"/>
     <service id="Knp\Bundle\MarkdownBundle\MarkdownParserInterface" alias="markdown.parser.light"/>
     <service id="Michelf\MarkdownInterface" alias="markdown.parser.light"/>
+    <service id="Http\Message\MessageFactory" alias="httplug.message_factory.default" public="false"/>
+    <service id="Http\Message\RequestFactory" alias="httplug.message_factory.default" public="false"/>
+    <service id="Http\Message\ResponseFactory" alias="httplug.message_factory.default" public="false"/>
+    <service id="Http\Message\StreamFactory" alias="httplug.stream_factory.default" public="false"/>
+    <service id="Http\Message\UriFactory" alias="httplug.uri_factory.default" public="false"/>
+    <service id="Http\Client\HttpAsyncClient" alias="httplug.async_client.default" public="false"/>
+    <service id="Http\Client\HttpClient" alias="httplug.client.app.http_methods" public="false"/>
+    <service id="httplug.client" alias="httplug.client.app.http_methods" public="true"/>
+    <service id="httplug.message_factory" alias="httplug.message_factory.default" public="true"/>
+    <service id="httplug.uri_factory" alias="httplug.uri_factory.default" public="true"/>
+    <service id="httplug.stream_factory" alias="httplug.stream_factory.default" public="true"/>
+    <service id="httplug.client.default" alias="httplug.client.app.http_methods"/>
+    <service id="Http\Client\Common\HttpMethodsClientInterface" alias="httplug.client.app.http_methods"/>
+    <service id="nexy_slack.http.client" alias="httplug.client.app.http_methods" public="false"/>
+    <service id="nexy_slack.client" alias="Nexy\Slack\Client"/>
     <service id="argument_resolver.controller_locator" alias=".service_locator.cUaaTxr"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem" public="false"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
@@ -2427,6 +2719,15 @@
     <service id="event_dispatcher" alias="debug.event_dispatcher" public="true"/>
     <service id="controller_resolver" alias="debug.controller_resolver" public="false"/>
     <service id="argument_resolver" alias="debug.argument_resolver" public="false"/>
+    <service id="httplug.auto_discovery.auto_discovered_client" alias="httplug.collector.auto_discovered_client"/>
+    <service id="httplug.factory.auto" alias="httplug.collector.factory.auto" public="false"/>
+    <service id="httplug.factory.buzz" alias="httplug.collector.factory.buzz" public="false"/>
+    <service id="httplug.factory.curl" alias="httplug.collector.factory.curl" public="false"/>
+    <service id="httplug.factory.guzzle5" alias="httplug.collector.factory.guzzle5" public="false"/>
+    <service id="httplug.factory.guzzle6" alias="httplug.collector.factory.guzzle6" public="false"/>
+    <service id="httplug.factory.react" alias="httplug.collector.factory.react" public="false"/>
+    <service id="httplug.factory.socket" alias="httplug.collector.factory.socket" public="false"/>
+    <service id="httplug.client.app" alias="httplug.client.app.http_methods"/>
     <service id="argument_resolver.request_attribute" alias="debug.argument_resolver.request_attribute" public="false"/>
     <service id="argument_resolver.request" alias="debug.argument_resolver.request" public="false"/>
     <service id="argument_resolver.session" alias="debug.argument_resolver.session" public="false"/>
