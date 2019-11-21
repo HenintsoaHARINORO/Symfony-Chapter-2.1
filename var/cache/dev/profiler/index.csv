@@ -49,3 +49,13 @@ f63e77,127.0.0.1,GET,http://127.0.0.1:8000/news/why-asteroids-taste-like-bacon,1
 4bf68a,127.0.0.1,GET,http://127.0.0.1:8000/news/why-asteroids-taste-like-bacon,1574257896,,200
 597821,127.0.0.1,GET,http://localhost:8000/,1574314888,,200
 97c13e,127.0.0.1,GET,http://localhost:8000/news/why-asteroids-taste-like-bacon,1574314891,,200
+983c52,127.0.0.1,GET,http://localhost:8000/news/khaaaaaan,1574315468,,200
+59926f,127.0.0.1,GET,http://localhost:8000/news/khaaaaaan,1574315473,,200
+551c34,127.0.0.1,GET,http://localhost:8000/news/khaaaaaan,1574315566,,200
+779d72,127.0.0.1,GET,http://localhost:8000/news/khaaaaaan,1574315569,,200
+595069,127.0.0.1,POST,http://localhost:8000/news/khaaaaaan/heart,1574315572,,200
+2ef9ef,127.0.0.1,GET,http://localhost:8000/news/khaaaaaan,1574315723,,200
+11005b,127.0.0.1,GET,http://localhost:8000/news/khaaaaaan,1574315738,,200
+7aa462,127.0.0.1,GET,http://localhost:8000/news/khaaaaaan,1574315741,,200
+d99a7f,127.0.0.1,GET,http://localhost:8000/news/khaaaaaan,1574315745,,200
+1d49ab,127.0.0.1,GET,http://localhost:8000/news/khaaaaaan,1574316848,,200
