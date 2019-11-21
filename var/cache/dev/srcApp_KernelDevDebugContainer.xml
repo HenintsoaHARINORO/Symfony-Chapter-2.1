@@ -129,7 +129,7 @@
       </parameter>
     </parameter>
     <parameter key="env(VAR_DUMPER_SERVER)">127.0.0.1:9912</parameter>
-    <parameter key="nexy_slack.endpoint">https://hooks.slack.com/services/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  ~</parameter>
+    <parameter key="nexy_slack.endpoint">%env(SLACK_WEBHOOK_ENDPOINT)%</parameter>
     <parameter key="nexy_slack.config" type="collection">
       <parameter key="sticky_channel">false</parameter>
       <parameter key="markdown_in_attachments" type="collection"/>
@@ -2192,7 +2192,7 @@
       <argument type="service" id="httplug.message_factory.default"/>
     </service>
     <service id="Nexy\Slack\Client" class="Nexy\Slack\Client" public="true">
-      <argument>https://hooks.slack.com/services/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  ~</argument>
+      <argument>%env(SLACK_WEBHOOK_ENDPOINT)%</argument>
       <argument>%nexy_slack.config%</argument>
       <argument type="service" id="httplug.client.app.http_methods"/>
     </service>
