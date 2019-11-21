@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Service\MarkdownHelper;
+use App\Service\SlackClient;
 use Michelf\MarkdownInterface;
 use Nexy\Slack\Client;
 use Psr\Log\LoggerInterface;
@@ -40,7 +41,7 @@ class ArticleController extends AbstractController
     /**
      * @Route("/news/{slug}", name="article_show")
      */
-    public function show($slug,MarkdownHelper $markdownHelper,AdapterInterface $cache,MarkdownInterface $markdown ,Client $slack)
+    public function show($slug,MarkdownHelper $markdownHelper,AdapterInterface $cache,MarkdownInterface $markdown ,SlackClient $slack)
     {   if ($slug=='khaaaan')
             {
                 if ($slug === 'khaaaaaan')

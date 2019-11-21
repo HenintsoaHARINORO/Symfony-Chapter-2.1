@@ -129,7 +129,7 @@
       </parameter>
     </parameter>
     <parameter key="env(VAR_DUMPER_SERVER)">127.0.0.1:9912</parameter>
-    <parameter key="nexy_slack.endpoint">%env(SLACK_WEBHOOK_ENDPOINT)%</parameter>
+    <parameter key="nexy_slack.endpoint">%env(string:SLACK_WEBHOOK_ENDPOINT)%</parameter>
     <parameter key="nexy_slack.config" type="collection">
       <parameter key="sticky_channel">false</parameter>
       <parameter key="markdown_in_attachments" type="collection"/>
@@ -208,7 +208,7 @@
       <tag name="container.service_subscriber"/>
       <argument>true</argument>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.dQLoVti.App\Controller\ArticleController"/>
+        <argument type="service" id=".service_locator.XmzNGwn.App\Controller\ArticleController"/>
       </call>
     </service>
     <service id="App\Kernel" class="App\Kernel" public="false" autowire="true" autoconfigure="true"/>
@@ -217,6 +217,12 @@
       <argument type="service" id="markdown.parser.light"/>
       <argument type="service" id="monolog.logger.markdown"/>
       <argument>true</argument>
+    </service>
+    <service id="App\Service\SlackClient" class="App\Service\SlackClient" public="false" autowire="true" autoconfigure="true">
+      <argument type="service" id="Nexy\Slack\Client"/>
+      <call method="setLogger">
+        <argument type="service" id="monolog.logger"/>
+      </call>
     </service>
     <service id="controller_name_converter" class="Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser" public="false">
       <tag name="monolog.logger" channel="request"/>
@@ -2192,20 +2198,20 @@
       <argument type="service" id="httplug.message_factory.default"/>
     </service>
     <service id="Nexy\Slack\Client" class="Nexy\Slack\Client" public="true">
-      <argument>%env(SLACK_WEBHOOK_ENDPOINT)%</argument>
+      <argument>%env(string:SLACK_WEBHOOK_ENDPOINT)%</argument>
       <argument>%nexy_slack.config%</argument>
       <argument type="service" id="httplug.client.app.http_methods"/>
     </service>
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\ArticleController" class="App\Controller\ArticleController" public="false" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\ArticleController" class="App\Controller\ArticleController" public="false" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\ArticleController" class="App\Controller\ArticleController" public="false" autowire="true" autoconfigure="true" abstract="true"/>
-    <service id=".service_locator.ir1u_7E" class="Symfony\Component\DependencyInjection\ServiceLocator" public="false">
+    <service id=".service_locator.48dRzfM" class="Symfony\Component\DependencyInjection\ServiceLocator" public="false">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="cache" type="service" id="cache.app"/>
         <argument key="markdown" type="service" id="markdown.parser.light"/>
         <argument key="markdownHelper" type="service" id="App\Service\MarkdownHelper"/>
-        <argument key="slack" type="service" id="Nexy\Slack\Client"/>
+        <argument key="slack" type="service" id="App\Service\SlackClient"/>
       </argument>
     </service>
     <service id=".service_locator.1n6P8pO" class="Symfony\Component\DependencyInjection\ServiceLocator" public="false">
@@ -2214,12 +2220,12 @@
         <argument key="logger" type="service" id="monolog.logger"/>
       </argument>
     </service>
-    <service id=".service_locator.nQksvjE" class="Symfony\Component\DependencyInjection\ServiceLocator" public="false">
+    <service id=".service_locator.LtrQj0O" class="Symfony\Component\DependencyInjection\ServiceLocator" public="false">
       <tag name="container.service_locator"/>
       <argument type="collection">
-        <argument key="App\Controller\ArticleController::show" type="service" id=".service_locator.ir1u_7E"/>
+        <argument key="App\Controller\ArticleController::show" type="service" id=".service_locator.48dRzfM"/>
         <argument key="App\Controller\ArticleController::toggleArticleHeart" type="service" id=".service_locator.1n6P8pO"/>
-        <argument key="App\Controller\ArticleController:show" type="service" id=".service_locator.ir1u_7E"/>
+        <argument key="App\Controller\ArticleController:show" type="service" id=".service_locator.48dRzfM"/>
         <argument key="App\Controller\ArticleController:toggleArticleHeart" type="service" id=".service_locator.1n6P8pO"/>
       </argument>
     </service>
@@ -2379,7 +2385,7 @@
       <configurator class="Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddDebugLogProcessorPass" method="configureLogger"/>
     </service>
     <service id="monolog.handler.null_internal" class="Monolog\Handler\NullHandler"/>
-    <service id=".service_locator.dQLoVti" class="Symfony\Component\DependencyInjection\ServiceLocator" public="false">
+    <service id=".service_locator.XmzNGwn" class="Symfony\Component\DependencyInjection\ServiceLocator" public="false">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="http_kernel" type="service" id="http_kernel" on-invalid="ignore"/>
@@ -2390,11 +2396,11 @@
         <argument key="twig" type="service" id="twig" on-invalid="ignore"/>
       </argument>
     </service>
-    <service id=".service_locator.dQLoVti.App\Controller\ArticleController" class="Symfony\Component\DependencyInjection\ServiceLocator" public="false">
+    <service id=".service_locator.XmzNGwn.App\Controller\ArticleController" class="Symfony\Component\DependencyInjection\ServiceLocator" public="false">
       <tag name="container.service_locator_context" id="App\Controller\ArticleController"/>
       <argument>App\Controller\ArticleController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.dQLoVti" method="withContext"/>
+      <factory service=".service_locator.XmzNGwn" method="withContext"/>
     </service>
     <service id=".service_locator.ZhaUOPm" class="Symfony\Component\DependencyInjection\ServiceLocator" public="false">
       <tag name="container.service_locator"/>
@@ -2492,12 +2498,12 @@
     <service id="debug.argument_resolver.request.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestValueResolver" public="false"/>
     <service id="debug.argument_resolver.session.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\SessionValueResolver" public="false"/>
     <service id="debug.argument_resolver.service.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver" public="false">
-      <argument type="service" id=".service_locator.nQksvjE"/>
+      <argument type="service" id=".service_locator.LtrQj0O"/>
     </service>
     <service id="debug.argument_resolver.default.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver" public="false"/>
     <service id="debug.argument_resolver.variadic.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\VariadicValueResolver" public="false"/>
     <service id="debug.argument_resolver.not_tagged_controller.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver" public="false">
-      <argument type="service" id=".service_locator.nQksvjE"/>
+      <argument type="service" id=".service_locator.LtrQj0O"/>
     </service>
     <service id=".service_locator.UwRI0uT" class="Symfony\Component\DependencyInjection\ServiceLocator" public="false">
       <tag name="container.service_locator"/>
@@ -2697,7 +2703,7 @@
     <service id="Http\Client\Common\HttpMethodsClientInterface" alias="httplug.client.app.http_methods"/>
     <service id="nexy_slack.http.client" alias="httplug.client.app.http_methods" public="false"/>
     <service id="nexy_slack.client" alias="Nexy\Slack\Client"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.nQksvjE"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.LtrQj0O"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem" public="false"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id="Psr\Log\LoggerInterface $requestLogger" alias="monolog.logger.request"/>
@@ -2728,6 +2734,6 @@
     <service id="argument_resolver.default" alias="debug.argument_resolver.default" public="false"/>
     <service id="argument_resolver.variadic" alias="debug.argument_resolver.variadic" public="false"/>
     <service id="argument_resolver.not_tagged_controller" alias="debug.argument_resolver.not_tagged_controller" public="false"/>
-    <service id=".service_locator.2.UUSdm" alias=".service_locator.dQLoVti" public="false"/>
+    <service id=".service_locator.tXF6q_7" alias=".service_locator.XmzNGwn" public="false"/>
   </services>
 </container>
